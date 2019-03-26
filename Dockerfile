@@ -37,5 +37,6 @@ RUN conda install --quiet -y $(cat /etc/custom_py.txt) && \
     conda clean -tipsy && \
     fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
-RUN pip install -U ray
-# docker container run -it --rm -e JUPYTER_ENABLE_LAB=yes -p 8888:8888 -v $(pwd)/../../code:/home/jovyan/work --mount type=tmpfs,destination=/data,tmpfs-mode=1777 --add-host=github.******.com:******* --name jupyspark dataismus/jupyspark
+
+CMD start-notebook.sh
+# CMD nohup start-notebook.sh &>/dev/null && bash
