@@ -38,5 +38,9 @@ RUN conda install --quiet -y $(cat /etc/custom_py.txt) && \
     fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
 
-CMD start-notebook.sh
-# CMD nohup start-notebook.sh &>/dev/null && bash
+ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info
+ENV PATH=$SPARK_HOME/bin:$PATH
+ENV PYSPARK_PYTHON=python3
+
+# CMD start-notebook.sh
+CMD nohup start-notebook.sh &>/dev/null && bash

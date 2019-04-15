@@ -1,0 +1,59 @@
+version: "3.3"
+services:
+  jupyspark:
+  # docker container run -it --rm -e JUPYTER_ENABLE_LAB=yes -p 8888:8888 -v $(pwd)/../../code:/home/jovyan/work 
+  # --mount type=tmpfs,destination=/data,tmpfs-mode=1777 --add-host=github.blah.com:11.11.11.11 
+  # --name jupyspark dataismus/jupyspark:LOCAL 
+    image: dataismus/jupyspark:LOCAL
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+    container_name: jupyspark
+    ports:
+      - 8888:8888
+    networks:
+      - spark_cluster
+    volumes:
+      # - /Users/dimitris/work/datasets/:/home/jovyan/data 
+      - .:/home/jovyan/work
+    tmpfs:
+      - /data:mode=1777,size=1000
+    extra_hosts:
+      - github.blah.com:11.11.11.11
+    command: start-notebook.sh
+
+##################### the Spark cluster nodes #######################
+#####################################################################
+
+  spark-master:
+    image: dataismus/spark_node:latest
+    depends_on:
+      - jupyspark
+    container_name: spark-master
+    hostname: spark-master
+    ports:
+      - 8080:8080
+      - 7077:7077
+    networks:
+      - spark_cluster
+    environment:
+      - SPARK_MASTER_LOG=/spark/logs
+    command: /spark/bin/spark-class org.apache.spark.deploy.master.Master --ip spark-master --port 7077 --webui-port 8080
+  spark-worker:
+    image: dataismus/spark_node:latest
+    depends_on:
+      - spark-master
+    ports:
+      - 8081
+    networks:
+      - spark_cluster
+    environment:
+      - SPARK_WORKER_LOG=/spark/logs
+    command: /spark/bin/spark-class org.apache.spark.deploy.worker.Worker --webui-port 8081 spark://spark-master:7077
+
+
+networks:  
+  spark_cluster:
+    driver: bridge
+    ipam:
+      driver: default
