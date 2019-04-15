@@ -1,3 +1,5 @@
+# docker-compose -f jupyspark_compose.yml up --scale spark-worker=2 (-d)
+# docker-compose -f jupyspark_compose.yml down
 version: "3.3"
 services:
   jupyspark:
@@ -15,7 +17,7 @@ services:
       - spark_cluster
     volumes:
       # - /Users/dimitris/work/datasets/:/home/jovyan/data 
-      - .:/home/jovyan/work
+      - ./../../code:/home/jovyan/work
     tmpfs:
       - /data:mode=1777,size=1000
     extra_hosts:
@@ -24,6 +26,7 @@ services:
 
 ##################### the Spark cluster nodes #######################
 #####################################################################
+# spark-submit --master spark://spark-master:7077 --class org.apache.spark.examples.SparkPi $SPARK_HOME/examples/jars/spark-examples_2.11-2.4.0.jar 100
 
   spark-master:
     image: dataismus/spark_node:latest
