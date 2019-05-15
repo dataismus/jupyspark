@@ -1,4 +1,4 @@
-# docker-compose -f jupyspark_standalone_compose.yml up --scale spark-worker=2 (-d)
+# docker-compose -f jupyspark_standalone_compose.yml up --scale spark-worker=2 (-d) --no-recreate
 # docker-compose -f jupyspark_standalone_compose.yml down
 version: "3.3"
 services:
@@ -13,8 +13,15 @@ services:
     container_name: jupyspark
     ports:
       - 8888:8888
+      - 4040:4040
+      - 4041:4041
+      - 4042:4042
+      - 4043:4043
+      - 4044:4044
     networks:
       - spark_cluster
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
     volumes:
       # - /Users/dimitris/work/datasets/:/home/jovyan/data 
       - ./../../code:/home/jovyan/work
