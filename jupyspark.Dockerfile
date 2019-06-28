@@ -11,7 +11,6 @@ RUN apt-get -y update && \
     rm -rf /var/lib/apt/lists/*
 
 # COPY spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz /tmp/spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz
-
 RUN cd /tmp && \
     wget -q https://www-us.apache.org/dist/spark/spark-${APACHE_SPARK_VERSION}/spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz && \
     tar -xvzf spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz -C /usr/local --owner root --group root --no-same-owner && \
@@ -22,6 +21,9 @@ RUN cd /usr/local && ln -s spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERS
 ENV SPARK_HOME /usr/local/spark
 ENV PYTHONPATH $SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.7-src.zip
 ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info
+
+RUN apt-get -y update && apt-get install -y p7zip-full 
+#16.02
 
 # Bash preferences, aliases, messages, DNS etc.
 USER $NB_UID
@@ -44,6 +46,6 @@ ENV PYSPARK_PYTHON=python3
 # CMD start-notebook.sh
 CMD nohup start-notebook.sh &>/dev/null && bash
 
-# docker container run -it --rm -e JUPYTER_ENABLE_LAB=yes -p 8888:8888 -v $(pwd)/../../code:/home/jovyan/work 
-# --mount type=tmpfs,destination=/data,tmpfs-mode=1777 --add-host=github.blah.com:11.11.11.11 
+# docker container run -it --rm -e JUPYTER_ENABLE_LAB=yes -p 8888:8888 -v $(pwd)/../../code:/home/jovyan/work \
+# --mount type=tmpfs,destination=/data,tmpfs-mode=1777 --add-host=github.blah.com:11.11.11.11  \
 # --name jupyspark dataismus/jupyspark:LOCAL 
