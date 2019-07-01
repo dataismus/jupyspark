@@ -7,7 +7,7 @@ ENV APACHE_SPARK_VERSION 2.4.3
 ENV HADOOP_VERSION 2.7
 
 RUN apt-get -y update && \
-    apt-get install --no-install-recommends -y openjdk-8-jre-headless ca-certificates-java && \
+    apt-get install --no-install-recommends -yq openjdk-8-jre-headless ca-certificates-java && \
     rm -rf /var/lib/apt/lists/*
 
 # COPY spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz /tmp/spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz
@@ -34,7 +34,6 @@ RUN echo 'alias jupylist="jupyter notebook list"' >> /home/$NB_USER/.bashrc && \
 # Install pyarrow & misc. packs
 COPY custom_py.txt custom_py_w_channels.txt /etc/
 # RUN conda install --quiet -y $(cat /etc/custom_py_w_channels.txt)
-USER $NB_UID
 RUN conda install --quiet -y $(cat /etc/custom_py.txt) && \
     conda install --quiet -y -c spacy spacy=2.0.* && \
     conda clean -tipsy && \
@@ -49,6 +48,7 @@ ENV PYSPARK_PYTHON=python3
 
 # CMD start-notebook.sh
 # CMD nohup start-notebook.sh &>/dev/null && bash
+USER $NB_UID
 CMD start-notebook.sh
 
 # docker container run -it --rm -e JUPYTER_ENABLE_LAB=yes -p 8888:8888 -v $(pwd)/../../code:/home/jovyan/work \
