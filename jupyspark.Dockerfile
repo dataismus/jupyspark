@@ -40,17 +40,19 @@ RUN conda install --quiet -y $(cat /etc/custom_py.txt) && \
     fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
 
-
 EXPOSE 22 8022
 ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info
 ENV PATH=$SPARK_HOME/bin:$PATH
 ENV PYSPARK_PYTHON=python3
 
-# CMD start-notebook.sh
 # CMD nohup start-notebook.sh &>/dev/null && bash
 USER $NB_UID
 CMD start-notebook.sh
 
-# docker container run -it --rm -e JUPYTER_ENABLE_LAB=yes -p 8888:8888 -v $(pwd)/../../code:/home/jovyan/work \
-# --mount type=tmpfs,destination=/data,tmpfs-mode=1777 --add-host=github.blah.com:11.11.11.11  \
-# --name jupyspark dataismus/jupyspark:LOCAL 
+# docker container run -d --rm -e JUPYTER_ENABLE_LAB=yes -p 8888:8888 \
+#     -v $(pwd)/../../code:/home/jovyan/work \
+#     --mount type=tmpfs,destination=/data,tmpfs-mode=1777 --name jupyspark \ 
+#     --add-host=github.blah.com:11.11.11.11  \
+#     eu.gcr.io/ia-ferris-next/jupyspark:1.1 \
+#     && sleep 10s \
+#     && docker container exec -it jupyspark jupyter notebook list
