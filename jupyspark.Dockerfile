@@ -59,6 +59,8 @@ CMD start-notebook.sh
 
 
 COPY finallist_packages.txt /etc/
-RUN conda install --quiet -y $(cat /etc/finallist_packages.txt)
+RUN apt-get -y update && apt-get install -yq $(cat /etc/finallist_packages.txt)
+# RUN conda install --quiet -y $(cat /etc/finallist_packages.txt)
+
 
 USER $NB_UID
