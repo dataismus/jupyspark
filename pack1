@@ -1,7 +1,6 @@
 anaconda-project
 astropy
 backports.os
-backports.shutil-get-terminal-size
 bitarray
 bkcharts
 blaze
