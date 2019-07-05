@@ -1,1 +1,18 @@
-backports.shutil-get-terminal-size
+- backports.shutil-get-terminal-size
+
+  - mkl-fft
+  - mkl-random
+  - jupyter-contrib-nbextensions
+  - modin
+  - nb-conda-kernels
+  - jupyterhub-simplespawner
+    
+    - pip-chill
+  - pipdeptree
+
+- sklearn-crfsuite
+  - tables
+  - ruamel-yaml
+  - pixiedust
+  - rasa-nlu
+  allennlp

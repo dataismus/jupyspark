@@ -67,5 +67,10 @@ RUN conda install --quiet -y $(cat /etc/pack1) && \
     fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
 
+COPY pack2 /etc/pack2
+# RUN apt-get -y update && apt-get install -yq $(cat /etc/root_packages.txt)
+RUN conda install --quiet -y $(cat /etc/pack2) && \
+    conda clean -tipsy
+
 
 USER $NB_UID
