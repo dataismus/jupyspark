@@ -46,7 +46,7 @@ ENV PATH=$SPARK_HOME/bin:$PATH
 ENV PYSPARK_PYTHON=python3
 
 # CMD nohup start-notebook.sh &>/dev/null && bash
-USER $NB_UID
+# USER $NB_UID
 CMD start-notebook.sh
 
 # docker container run -d --rm -e JUPYTER_ENABLE_LAB=yes -p 8888:8888 \
@@ -58,9 +58,10 @@ CMD start-notebook.sh
 #     && docker container exec -it jupyspark jupyter notebook list
 
 
-# COPY finallist_packages.txt /etc/
-# RUN apt-get -y update && apt-get install -yq $(cat /etc/finallist_packages.txt)
-# # RUN conda install --quiet -y $(cat /etc/finallist_packages.txt)
+COPY finallist_packages.txt /etc/
+COPY Latest_root_ packages_v2.txt /etc/root_packages.txt
+# RUN apt-get -y update && apt-get install -yq $(cat /etc/root_packages.txt)
+RUN conda install --quiet -y $(cat /etc/root_packages.txt)
 
 
-# USER $NB_UID
+USER $NB_UID
