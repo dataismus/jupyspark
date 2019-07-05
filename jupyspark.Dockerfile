@@ -58,10 +58,13 @@ CMD start-notebook.sh
 #     && docker container exec -it jupyspark jupyter notebook list
 
 
-COPY finallist_packages.txt /etc/
+COPY finallist_packages.txt /etc/finallist_packages.txt
 COPY Latest_root_ packages_v2.txt /etc/root_packages.txt
 # RUN apt-get -y update && apt-get install -yq $(cat /etc/root_packages.txt)
-RUN conda install --quiet -y $(cat /etc/root_packages.txt)
+RUN conda install --quiet -y $(cat /etc/root_packages.txt) && \
+    conda clean -tipsy && \
+    fix-permissions $CONDA_DIR && \
+    fix-permissions /home/$NB_USER
 
 
 USER $NB_UID
