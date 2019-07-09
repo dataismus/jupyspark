@@ -36,6 +36,7 @@ COPY custom_py.txt custom_py_w_channels.txt /etc/
 # RUN conda install --quiet -y $(cat /etc/custom_py_w_channels.txt)
 RUN conda install --quiet -y $(cat /etc/custom_py.txt) && \
     conda install --quiet -y -c spacy spacy=2.0.* && \
+    conda install --quiet -y -c conda-forge python-hdfs sparkmagic && \
     conda clean -tipsy && \
     fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
