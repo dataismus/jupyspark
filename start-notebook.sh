@@ -12,8 +12,3 @@ elif [[ ! -z "${JUPYTER_ENABLE_LAB}" ]]; then
 else
   . /usr/local/bin/start.sh jupyter notebook "$@"
 fi
-
-# start.sh jupyter lab --LabApp.token=''
-  # docker container run -it --rm -e JUPYTER_ENABLE_LAB=yes -p 8888:8888 -v $(pwd)/../../code:/home/jovyan/work 
-  # --mount type=tmpfs,destination=/data,tmpfs-mode=1777 --add-host=github.blah.com:11.11.11.11 
-  # --name jupyspark dataismus/jupyspark:LOCAL 

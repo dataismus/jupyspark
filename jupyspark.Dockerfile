@@ -22,7 +22,7 @@ ENV SPARK_HOME /usr/local/spark
 ENV PYTHONPATH $SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.7-src.zip
 ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info
 
-RUN apt-get -y update && apt-get install -yq p7zip-full openssh-server nano && service ssh start
+RUN apt-get -y update && apt-get install -yq p7zip-full openssh-server nano telnet curl && service ssh start
 RUN pip install jupyterlab_sql && \
     jupyter serverextension enable jupyterlab_sql --py --sys-prefix && \
     jupyter lab build
@@ -45,32 +45,11 @@ ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M -
 ENV PATH=$SPARK_HOME/bin:$PATH
 ENV PYSPARK_PYTHON=python3
 
-# CMD nohup start-notebook.sh &>/dev/null && bash
-# USER $NB_UID
-CMD start-notebook.sh
-
-# docker container run -d --rm -e JUPYTER_ENABLE_LAB=yes -p 8888:8888 \
-#     -v $(pwd)/../../code:/home/jovyan/work \
-#     --mount type=tmpfs,destination=/data,tmpfs-mode=1777 --name jupyspark \ 
-#     --add-host=github.blah.com:11.11.11.11  \
-#     eu.gcr.io/ia-ferris-next/jupyspark:1.1 \
-#     && sleep 10s \
-#     && docker container exec -it jupyspark jupyter notebook list
-
-
-COPY finallist_packages.txt /etc/finallist_packages.txt
-COPY Latest_root_packages_v2.txt /etc/root_packages.txt
-COPY pack1 /etc/pack1
-# RUN apt-get -y update && apt-get install -yq $(cat /etc/root_packages.txt)
-RUN conda install --quiet -y $(cat /etc/pack1) && \
-    conda clean -tipsy && \
-    fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER
-
-COPY pack2 /etc/pack2
-# RUN apt-get -y update && apt-get install -yq $(cat /etc/root_packages.txt)
-RUN conda install --quiet -y $(cat /etc/pack2) && \
-    conda clean -tipsy
-
+# SSH config and launch (necessary for cluster deployment) =========
+EXPOSE 22 8022
 
 USER $NB_UID
+# CMD nohup start-notebook.sh &>/dev/null && bash
+CMD start-notebook.sh
+
+# docker container run -d --rm -e JUPYTER_ENABLE_LAB=yes -p 8888:8888 -v $(pwd)/../../code:/home/jovyan/work --mount type=tmpfs,destination=/data,tmpfs-mode=1777 --name jupyspark eu.gcr.io/ia-ferris-next/jupyspark:hr && sleep 10s && docker container exec -it jupyspark jupyter notebook list
