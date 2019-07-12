@@ -51,10 +51,9 @@ EXPOSE 22 8022
 
 USER $NB_UID
 # CMD nohup start-notebook.sh &>/dev/null && bash
-CMD start-notebook.sh
+CMD server ssh start && start-notebook.sh
 
 # TO ADD:
-# "ssh service start" in the entrypoint
 # password enable, set default to joyan123
 # configure ssh-server?
 # downngrade the package list to 61
