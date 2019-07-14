@@ -23,6 +23,7 @@ ENV PYTHONPATH $SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.7-src.zip
 ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info
 
 RUN apt-get -y update && apt-get install -yq p7zip-full openssh-server nano telnet curl
+USER $NB_UID
 RUN pip install jupyterlab_sql && \
     jupyter serverextension enable jupyterlab_sql --py --sys-prefix && \
     jupyter lab build
@@ -33,7 +34,7 @@ RUN echo 'alias jupylist="jupyter notebook list"' >> /home/$NB_USER/.bashrc && \
 
 # Install pyarrow & misc. packs
 COPY custom_py.txt custom_py_w_channels.txt /etc/
-USER $NB_UID
+
 # RUN conda install --quiet -y $(cat /etc/custom_py_w_channels.txt)
 RUN conda install --quiet -y $(cat /etc/custom_py.txt) && \
     conda install --quiet -y -c spacy spacy=2.0.* && \
