@@ -41,7 +41,8 @@ RUN conda install --quiet -y $(cat /etc/custom_py.txt) && \
     conda install --quiet -y -c conda-forge python-hdfs sparkmagic && \
     conda clean -tipsy && \
     fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER
+    fix-permissions /home/$NB_USER && \
+    fix-permissions $SPARK_HOME
 
 EXPOSE 22 8022
 ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info
@@ -62,4 +63,4 @@ CMD server ssh start && start-notebook.sh
 
 
 
-# docker container run -d --rm -e JUPYTER_ENABLE_LAB=yes -p 8888:8888 -v $(pwd)/../../code:/home/jovyan/work --mount type=tmpfs,destination=/data,tmpfs-mode=1777 --name jupyspark eu.gcr.io/ia-ferris-next/jupyspark:hr && sleep 10s && docker container exec -it jupyspark jupyter notebook list
+# docker container run -d --rm -e JUPYTER_ENABLE_LAB=yes -p 8888:8888 -v $(pwd)/../../code:/home/jovyan/work --mount type=tmpfs,destination=/data,tmpfs-mode=1777 --name jupyspark eu.gcr.io/ia-ferris-next/jupyspark:hr && sleep 5s && docker container exec -it jupyspark jupyter notebook list
