@@ -33,6 +33,7 @@ RUN echo 'alias jupylist="jupyter notebook list"' >> /home/$NB_USER/.bashrc && \
 
 # Install pyarrow & misc. packs
 COPY custom_py.txt custom_py_w_channels.txt /etc/
+USER $NB_UID
 # RUN conda install --quiet -y $(cat /etc/custom_py_w_channels.txt)
 RUN conda install --quiet -y $(cat /etc/custom_py.txt) && \
     conda install --quiet -y -c spacy spacy=2.0.* && \
@@ -49,7 +50,7 @@ ENV PYSPARK_PYTHON=python3
 # SSH config and launch (necessary for cluster deployment) =========
 EXPOSE 22 8022
 
-USER $NB_UID
+# USER $NB_UID
 # CMD nohup start-notebook.sh &>/dev/null && bash
 CMD server ssh start && start-notebook.sh
 
