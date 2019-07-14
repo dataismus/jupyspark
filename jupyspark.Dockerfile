@@ -7,7 +7,7 @@ ENV APACHE_SPARK_VERSION 2.4.3
 ENV HADOOP_VERSION 2.7
 
 RUN apt-get -y update && \
-    apt-get install --no-install-recommends -yq openjdk-8-jre-headless ca-certificates-java && \
+    apt-get install --no-install-recommends -yq openjdk-8-jre-headless ca-certificates-java python3-pip && \
     rm -rf /var/lib/apt/lists/*
 
 # COPY spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz /tmp/spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz
@@ -24,7 +24,7 @@ ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M -
 
 RUN apt-get -y update && apt-get install -yq p7zip-full openssh-server nano telnet curl
 USER $NB_UID
-RUN pip install jupyterlab_sql && \
+RUN pip3 install jupyterlab_sql && \
     jupyter serverextension enable jupyterlab_sql --py --sys-prefix && \
     jupyter lab build
 
@@ -58,9 +58,20 @@ CMD server ssh start && start-notebook.sh
 
 # TO ADD:
 # password enable, set default to joyan123
-# configure ssh-server?
 # downngrade the package list to 61
 
+# COPY ssh.pwd /etc/ssh.pwd
+# RUN mkdir /var/run/sshd
+# RUN cat ssh.pwd | chpasswd
+# RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
+# # SSH login fix. Otherwise user is kicked off after login
+# RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 
-# docker container run -d --rm -e JUPYTER_ENABLE_LAB=yes -p 8888:8888 -v $(pwd)/../../code:/home/jovyan/work --mount type=tmpfs,destination=/data,tmpfs-mode=1777 --name jupyspark eu.gcr.io/ia-ferris-next/jupyspark:hr && sleep 5s && docker container exec -it jupyspark jupyter notebook list
+# ENV NOTVISIBLE "in users profile"
+# RUN echo "export VISIBLE=now" >> /etc/profile
+
+# EXPOSE 22
+# CMD ["/usr/sbin/sshd", "-D"]
+
+# docker container run -d --rm -e JUPYTER_ENABLE_LAB=yes -p -e SSH_PWD "jovyan:jovyan123" 8888:8888 -p 8022:22 -v $(pwd)/../../code:/home/jovyan/work --mount type=tmpfs,destination=/data,tmpfs-mode=1777 --name jupyspark eu.gcr.io/ia-ferris-next/jupyspark:hr && sleep 5s && docker container exec -it jupyspark jupyter notebook list
