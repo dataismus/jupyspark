@@ -21,9 +21,10 @@ RUN cd /usr/local && ln -s spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERS
 ENV SPARK_HOME /usr/local/spark
 ENV PYTHONPATH $SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.7-src.zip
 ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info
-
+EXPOSE 22 8022
+ENV PATH=$SPARK_HOME/bin:$PATH
+ENV PYSPARK_PYTHON=python3
 RUN apt-get -y update && apt-get install -yq p7zip-full openssh-server nano telnet curl python3-pip
-
 
 # Bash preferences, aliases, messages, DNS etc.
 RUN echo 'alias jupylist="jupyter notebook list"' >> /home/$NB_USER/.bashrc && \
@@ -43,13 +44,16 @@ RUN conda install --quiet -y $(cat /etc/custom_py.txt) && \
     fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
 
-EXPOSE 22 8022
-ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info
-ENV PATH=$SPARK_HOME/bin:$PATH
-ENV PYSPARK_PYTHON=python3
+ENV SPARKMAGIC_HOME /opt/conda/lib/python3.7/site-packages/sparkmagic
 
-# SSH config and launch (necessary for cluster deployment) =========
-EXPOSE 22 8022
+RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension && \
+# Install the wrapper kernels. Do pip show sparkmagic and it will show the path where sparkmagic is installed at. cd to that location and do:
+    jupyter-kernelspec install ${SPARKMAGIC_HOME}/kernels/sparkkernel && \
+    jupyter-kernelspec install ${SPARKMAGIC_HOME}/kernels/pysparkkernel && \
+    jupyter-kernelspec install ${SPARKMAGIC_HOME}/kernels/sparkrkernel && \
+# (Optional) Modify the configuration file at ~/.sparkmagic/config.json. Look at the example_config.json
+# (Optional) Enable the server extension so that clusters can be programatically changed:
+    jupyter serverextension enable --py sparkmagic 
 
 # USER $NB_UID
 # CMD nohup start-notebook.sh &>/dev/null && bash
