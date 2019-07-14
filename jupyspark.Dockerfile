@@ -7,7 +7,7 @@ ENV APACHE_SPARK_VERSION 2.4.3
 ENV HADOOP_VERSION 2.7
 
 RUN apt-get -y update && \
-    apt-get install --no-install-recommends -yq openjdk-8-jre-headless ca-certificates-java python3-pip && \
+    apt-get install --no-install-recommends -yq openjdk-8-jre-headless ca-certificates-java && \
     rm -rf /var/lib/apt/lists/*
 
 # COPY spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz /tmp/spark-${APACHE_SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz
@@ -22,27 +22,26 @@ ENV SPARK_HOME /usr/local/spark
 ENV PYTHONPATH $SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.7-src.zip
 ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info
 
-RUN apt-get -y update && apt-get install -yq p7zip-full openssh-server nano telnet curl
-USER $NB_UID
-RUN pip3 install jupyterlab_sql && \
-    jupyter serverextension enable jupyterlab_sql --py --sys-prefix && \
-    jupyter lab build
+RUN apt-get -y update && apt-get install -yq p7zip-full openssh-server nano telnet curl python3-pip
+
 
 # Bash preferences, aliases, messages, DNS etc.
 RUN echo 'alias jupylist="jupyter notebook list"' >> /home/$NB_USER/.bashrc && \
-    echo 'echo "\nGo ahead and type \"jupylist\", see what you find out..\n" ' >> /home/$NB_USER/.bashrc
+    echo 'echo "\nGo ahead and type \"jupylist\", see what you find out..\n" ' >> /home/$NB_USER/.bashrc && \
+    chmod 777 $SPARK_HOME
 
 # Install pyarrow & misc. packs
 COPY custom_py.txt custom_py_w_channels.txt /etc/
 
+USER $NB_UID
 # RUN conda install --quiet -y $(cat /etc/custom_py_w_channels.txt)
 RUN conda install --quiet -y $(cat /etc/custom_py.txt) && \
     conda install --quiet -y -c spacy spacy=2.0.* && \
     conda install --quiet -y -c conda-forge python-hdfs sparkmagic && \
     conda clean -tipsy && \
+    # conda build purge-all
     fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER && \
-    fix-permissions $SPARK_HOME
+    fix-permissions /home/$NB_USER
 
 EXPOSE 22 8022
 ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info
