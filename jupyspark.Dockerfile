@@ -55,16 +55,8 @@ RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension && \
 # (Optional) Enable the server extension so that clusters can be programatically changed:
     jupyter serverextension enable --py sparkmagic 
 
-USER $NB_UID
-# CMD nohup start-notebook.sh &>/dev/null && bash
-CMD service ssh start && start-notebook.sh
-
-# TO ADD:
-# password enable, set default to joyan123
-# downngrade the package list to 61
-
 # COPY ssh.pwd /etc/ssh.pwd
-# RUN mkdir /var/run/sshd
+RUN mkdir /var/run/sshd
 # RUN cat ssh.pwd | chpasswd
 # RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
@@ -76,6 +68,16 @@ CMD service ssh start && start-notebook.sh
 
 # EXPOSE 22
 # CMD ["/usr/sbin/sshd", "-D"]
+
+USER $NB_UID
+# CMD nohup start-notebook.sh &>/dev/null && bash
+CMD service ssh start && start-notebook.sh
+
+# TO ADD:
+# password enable, set default to joyan123
+# downngrade the package list to 61
+
+
 
 # docker container run -d --rm -e JUPYTER_ENABLE_LAB=yes -p -e SSH_PWD "jovyan:jovyan123" 8888:8888 -p 8022:22 -v $(pwd)/../../code:/home/jovyan/work --mount type=tmpfs,destination=/data,tmpfs-mode=1777 --name jupyspark dataismus/jupyspark && sleep 5s && docker container exec -it jupyspark jupyter notebook list
 
