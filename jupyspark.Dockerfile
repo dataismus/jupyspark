@@ -44,8 +44,8 @@ RUN conda install --quiet -y $(cat /etc/custom_py.txt) && \
     fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
 
+USER root
 ENV SPARKMAGIC_HOME /opt/conda/lib/python3.7/site-packages/sparkmagic
-
 RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension && \
 # Install the wrapper kernels. Do pip show sparkmagic and it will show the path where sparkmagic is installed at. cd to that location and do:
     jupyter-kernelspec install ${SPARKMAGIC_HOME}/kernels/sparkkernel && \
@@ -55,9 +55,9 @@ RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension && \
 # (Optional) Enable the server extension so that clusters can be programatically changed:
     jupyter serverextension enable --py sparkmagic 
 
-# USER $NB_UID
+USER $NB_UID
 # CMD nohup start-notebook.sh &>/dev/null && bash
-CMD server ssh start && start-notebook.sh
+CMD service ssh start && start-notebook.sh
 
 # TO ADD:
 # password enable, set default to joyan123
@@ -77,4 +77,14 @@ CMD server ssh start && start-notebook.sh
 # EXPOSE 22
 # CMD ["/usr/sbin/sshd", "-D"]
 
-# docker container run -d --rm -e JUPYTER_ENABLE_LAB=yes -p -e SSH_PWD "jovyan:jovyan123" 8888:8888 -p 8022:22 -v $(pwd)/../../code:/home/jovyan/work --mount type=tmpfs,destination=/data,tmpfs-mode=1777 --name jupyspark eu.gcr.io/ia-ferris-next/jupyspark:hr && sleep 5s && docker container exec -it jupyspark jupyter notebook list
+# docker container run -d --rm -e JUPYTER_ENABLE_LAB=yes -p -e SSH_PWD "jovyan:jovyan123" 8888:8888 -p 8022:22 -v $(pwd)/../../code:/home/jovyan/work --mount type=tmpfs,destination=/data,tmpfs-mode=1777 --name jupyspark dataismus/jupyspark && sleep 5s && docker container exec -it jupyspark jupyter notebook list
+
+# QUESTIONS:
+# 1. how to configure sparkmagics to reach Spark and configure a spark context?
+# 2. ROOT and Jovyan? What should each own?
+# 3. Why isnt sshd started on run?
+# 4. Why does chpasswd not work?
+# 5. How to set up passwd enabled ssh?
+# 6. how do i ssh from localhost (macbook) to container?   -->   ssh jovyan@127.0.0.1:8022
+# 7. what is the difference between ssh and sshd 
+# 8. Does a config need to be set if I am setting ssh up as passwordless?
