@@ -79,7 +79,8 @@ CMD service ssh start && start-notebook.sh
 
 
 
-# docker container run -d --rm -e JUPYTER_ENABLE_LAB=yes -p -e SSH_PWD "jovyan:jovyan123" 8888:8888 -p 8022:22 -v $(pwd)/../../code:/home/jovyan/work --mount type=tmpfs,destination=/data,tmpfs-mode=1777 --name jupyspark dataismus/jupyspark && sleep 5s && docker container exec -it jupyspark jupyter notebook list
+# docker container run -d --rm -e JUPYTER_ENABLE_LAB=yes -p 8888:8888 -p 8022:22 -v $(pwd)/../../code:/home/jovyan/work --mount type=tmpfs,destination=/data,tmpfs-mode=1777 --name jupyspark dataismus/jupyspark && sleep 5s && docker container exec -it jupyspark jupyter notebook list
+
 
 # QUESTIONS:
 # 1. how to configure sparkmagics to reach Spark and configure a spark context?
